@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  cassandra_db:
+    image: cassandra:4.1.0
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=my-cluster
+    networks:
+      - cassandra_network
+    volumes:
+      - ./scripts/cql:/docker-entrypoint-initdb.d
+
+  fastapi_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - cassandra_db
+    networks:
+      - cassandra_network
+
+networks:
+  cassandra_network:
